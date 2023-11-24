@@ -1,0 +1,26 @@
+CREATE  or replace FUNCTION consultarPaisesPorInicial(IN inicioCapital VARCHAR(255), IN codigoContinente VARCHAR(100))
+RETURNS VARCHAR(4000) AS $$
+
+DECLARE resultado VARCHAR(4000);
+BEGIN
+  SELECT STRING_AGG(
+        CONCAT(
+          T_PAIS.capital,
+          ' capital de ',
+          T_PAIS.nombre_pais,
+          ' (',
+          T_PAIS.cod_pais,
+          ') pertenece al continente ',
+          T_CONTINENTE.nombre_continente,
+          ' (',
+          T_CONTINENTE.cod_continente,
+          ')'
+      ), E'\n'
+    ) INTO resultado
+  FROM T_PAIS
+  JOIN T_CONTINENTE ON (T_PAIS.cod_continente = T_CONTINENTE.cod_continente)
+  WHERE T_PAIS.capital LIKE inicioCapital || '%' AND T_CONTINENTE.cod_continente = codigoContinente;
+
+  RETURN resultado;
+END;
+$$ LANGUAGE plpgsql;
